@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  dev-db:
+    image: postgres:14
+    ports:
+      - "5455:5432"
+    environment:
+      POSTGRES_USER: postgresUser
+      POSTGRES_PASSWORD: postgresPW
+      POSTGRES_DB: nestjs
+    networks:
+      - vodonesia
+networks:
+  vodonesia:
