@@ -10,40 +10,157 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model role {
-    id Int @id @default(autoincrement())
-    name String
-    is_delete Bool @default(false)
-    is_created Bool @default(false)
-    is_updated Bool @default(false)
-    is_report Bool @default(false)
-    is_download Bool @default(false)
+model themes {
+  id          Int           @id @default(autoincrement())
+  name        String?
+  slug        String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  themes_menu themes_menu[]
 }
 
-//model role_permissions {
-//    id Int @id @default(autoincrement())
-//
-//}
+model themes_menu {
+  id               Int                @id @default(autoincrement())
+  name             String?
+  themes           themes             @relation(fields: [themesId], references: [id], onDelete: Cascade)
+  themesId         Int
+  order            Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  themes_menu_item themes_menu_item[]
+}
+
+model themes_menu_item {
+  id           Int         @id @default(autoincrement())
+  menu         themes_menu @relation(fields: [themesMenuId], references: [id], onDelete: Cascade)
+  themesMenuId Int
+  title        String?
+  url          String?
+  target       String?
+  order        Int
+  icon         String?
+  color        String?
+  parentId     Int
+  parameter    String
+  route        String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
 
 model User {
-    id Int @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    email String @unique
-    username String?
-    hash String
-    firstName String?
-    lastName String?
+  id              Int               @id @default(autoincrement())
+  email           String            @unique
+  username        String?
+  hash            String
+  firstName       String?
+  lastName        String?
+  nest_blocker    nest_blocker[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  role_user       role_user[]
+  permission_user permission_user[]
+  activations     activations?
+  log_auth        log_auth[]
 }
 
-
-model Bookmark {
-    id Int @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    title String
-    description String?
-    link String
+model role {
+  id              Int               @id @default(autoincrement())
+  name            String
+  is_delete       Boolean           @default(false)
+  is_created      Boolean           @default(false)
+  is_updated      Boolean           @default(false)
+  is_report       Boolean           @default(false)
+  is_download     Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  role_user       role_user[]
+  permission_role permission_role[]
 }
 
+model role_user {
+  id        Int      @id @default(autoincrement())
+  role      role     @relation(fields: [roleId], references: [id])
+  roleId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model permission {
+  id              Int               @id @default(autoincrement())
+  name            String?
+  slug            String?           @unique
+  description     String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  permission_user permission_user[]
+  permission_role permission_role[]
+}
+
+model permission_user {
+  id           Int        @id @default(autoincrement())
+  permission   permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+  user         User       @relation(fields: [userId], references: [id])
+  userId       Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model permission_role {
+  id           Int        @id @default(autoincrement())
+  permission   permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+  role         role       @relation(fields: [roleId], references: [id])
+  roleId       Int
+}
+
+model password_reset {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  token      String?
+  status     Boolean  @default(false)
+  expires_in DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model activations {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
+  token     String?
+  ipAddress String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model log_auth {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int // relation scalar field  (used in the `@relation` attribute above)
+  ipAddress String?
+  status    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model nest_blocker {
+  id        Int               @id @default(autoincrement())
+  type      nest_blocker_type @relation(fields: [typeId], references: [id])
+  typeId    Int // relation scalar field  (used in the `@relation` attribute above)
+  value     String            @unique
+  note      String
+  user      User              @relation(fields: [userId], references: [id])
+  userId    Int // relation scalar field  (used in the `@relation` attribute above)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model nest_blocker_type {
+  id           Int            @id @default(autoincrement())
+  slug         String         @unique
+  name         String
+  nest_blocker nest_blocker[]
+}

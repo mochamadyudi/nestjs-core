@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param,Post } from '@nestjs/common';
 import { RoleService } from './role.service';
 
 @Controller('role')
@@ -8,5 +8,10 @@ export class RoleController{
   @Get('list')
   list(@Param() param){
     return 'hiiiii'
+  }
+
+  @Post()
+  create(){
+    return 'hiiii'
   }
 }
