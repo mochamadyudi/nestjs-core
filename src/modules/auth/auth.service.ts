@@ -2,18 +2,26 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import {PrismaService} from "../../prisma/prisma.service";
 import { _AuthSignInDto, AuthDto } from '@yid/entities';
 import * as argon from 'argon2'
-import { first } from 'rxjs';
+import { config, first } from 'rxjs';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from '../user/user.service';
 
 
 @Injectable({})
 export class AuthService{
-    constructor(private prisma: PrismaService) {
+    constructor(
+      private prisma: PrismaService,
+      private jwt: JwtService,
+      private config:ConfigService,
+      private userService: UserService
+    ) {
     }
 
     async login(dto:_AuthSignInDto){
         try{
             // @ts-ignore
-            const [err,user] = await this._checkEmail(dto.email)
+            const [err,user] = await this.userService._checkEmail(dto.email)
             if(err) throw new ForbiddenException(err?.message ?? "Some Error")
 
             if(!user) throw new ForbiddenException('Credentials incorrect!')
@@ -24,6 +32,8 @@ export class AuthService{
 
 
             delete user.hash
+            let token = await this._signToken(user.id,user.email)
+            Reflect.set(user,'token',token)
             return {
                 error:false,
                 message: "Successfully Sign in",
@@ -50,7 +60,7 @@ export class AuthService{
         }
         try{
 
-            const [err,dataUser] = await this._checkEmail(dto.email)
+            const [err,dataUser] = await this.userService._checkEmail(dto.email)
             if(err) throw new ForbiddenException(err?.message ?? "Some Error")
 
             if(dataUser) throw new ForbiddenException('Email is registered!')
@@ -77,20 +87,16 @@ export class AuthService{
     }
 
 
-    async _checkEmail(email){
-        try{
-            return this.prisma.user.findUnique({
-                where: {
-                    email
-                }
-            }).then((result)=> {
-                return [null, result]
-            })
-              .catch((err)=> {
-                  return [ err, null]
-              })
-        }catch(err){
-            return [ err, null ]
+    _signToken(userId: number,email: string): Promise<string>{
+        const payload = {
+            sub:userId,
+            email
         }
+
+        return this.jwt.signAsync(payload, {
+            expiresIn:'15m',
+            secret: this.config.get('JWT_SECRET') || process.env.JWT_SECRET || "yidSecret"
+        })
     }
+
 }
