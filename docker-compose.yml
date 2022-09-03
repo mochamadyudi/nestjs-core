@@ -10,5 +10,22 @@ services:
       POSTGRES_DB: nestjs
     networks:
       - vodonesia
+  web-dev:
+    image: node:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+        - "5100:5100"
+    volumes:
+      - npm-cache:/root/.npm
+    environment:
+      JWT_SECRET: yidSecret
+      JWT_EXPIRES_IN: 1day
+      PORT: 5100
+      DATABASE_URL: postgresql://postgresUser:postgresPW@localhost:5455/nestjs?schema=public
 networks:
   vodonesia:
+volumes:
+  npm-cache:
+    external: false
