@@ -2,6 +2,11 @@
 /dist
 /node_modules
 /prisma/migrations
+
+docker-compose.yml
+Dockerfile
+start.sh
+
 # Logs
 logs
 *.log

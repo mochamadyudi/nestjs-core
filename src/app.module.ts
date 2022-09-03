@@ -4,10 +4,11 @@ import { AppService } from './app.service';
 import { ConfigModule,ConfigService } from '@nestjs/config';
 
 
-import { PrismaModule } from '@yid/prisma';
-import { RoleModule } from './modules/role';
+
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { RoleModule } from './modules/role/role.module';
 
 
 @Module({
