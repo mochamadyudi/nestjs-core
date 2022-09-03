@@ -12,13 +12,9 @@ export class AuthService{
 
     async login(dto:_AuthSignInDto){
         try{
-            let fields = {
-                where: {
-                    email: dto.email
-                }
-            }
             // @ts-ignore
-            const user = await this.prisma.user.findUnique(fields)
+            const [err,user] = await this._checkEmail(dto.email)
+            if(err) throw new ForbiddenException(err?.message ?? "Some Error")
 
             if(!user) throw new ForbiddenException('Credentials incorrect!')
 
@@ -34,7 +30,11 @@ export class AuthService{
                 data: user
             }
         }catch (err){
-
+            return {
+                error:true,
+                message: err?.message ?? "Some Error",
+                data:null
+            }
         }
     }
 
@@ -42,16 +42,24 @@ export class AuthService{
         //generate hash password
         let hash = await argon.hash(dto.password)
         let username = dto.email.split('@')[0]
-        //save new user
-        let data = {
+
+        let fields = {
             email:dto.email,
             hash:hash,
             username: username
         }
         try{
+
+            const [err,dataUser] = await this._checkEmail(dto.email)
+            if(err) throw new ForbiddenException(err?.message ?? "Some Error")
+
+            if(dataUser) throw new ForbiddenException('Email is registered!')
+
+            //save new user
             const user = await this.prisma.user.create({
-                data:data
+                data:fields
             })
+
             delete user.hash
             //return the saved user
             return {
@@ -65,6 +73,24 @@ export class AuthService{
                 message: err.message,
                 data:null
             }
+        }
+    }
+
+
+    async _checkEmail(email){
+        try{
+            return this.prisma.user.findUnique({
+                where: {
+                    email
+                }
+            }).then((result)=> {
+                return [null, result]
+            })
+              .catch((err)=> {
+                  return [ err, null]
+              })
+        }catch(err){
+            return [ err, null ]
         }
     }
 }

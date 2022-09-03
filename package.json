@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && npm run migrate:dev",
+    "prisma:dev:devploy": "prisma generate deploy",
+    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 1 && npm run prisma:dev:devploy",
     "db:dev:rm": "docker compose rm dev-db -s -f -v",
     "db:dev:up": "docker compose up dev-db -d",
     "migrate:dev": "npx prisma migrate dev",
