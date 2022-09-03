@@ -89,12 +89,12 @@ export class AuthService{
 
     _signToken(userId: number,email: string): Promise<string>{
         const payload = {
-            sub:userId,
+            id:userId,
             email
         }
 
         return this.jwt.signAsync(payload, {
-            expiresIn:'15m',
+            expiresIn:this.config.get('JWT_EXPIRES_IN') || process.env.JWT_EXPIRES_IN || '15m',
             secret: this.config.get('JWT_SECRET') || process.env.JWT_SECRET || "yidSecret"
         })
     }

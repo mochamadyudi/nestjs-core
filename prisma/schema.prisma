@@ -10,6 +10,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model role {
+    id Int @id @default(autoincrement())
+    name String
+    is_delete Bool @default(false)
+    is_created Bool @default(false)
+    is_updated Bool @default(false)
+    is_report Bool @default(false)
+    is_download Bool @default(false)
+}
+
+//model role_permissions {
+//    id Int @id @default(autoincrement())
+//
+//}
+
 model User {
     id Int @id @default(autoincrement())
     createdAt DateTime @default(now())
@@ -20,6 +35,8 @@ model User {
     firstName String?
     lastName String?
 }
+
+
 model Bookmark {
     id Int @id @default(autoincrement())
     createdAt DateTime @default(now())

@@ -22,5 +22,35 @@ export class UserService{
     }
   }
 
+  async getProfiles(id:any){
+    try{
+      return this.prisma.user.findUnique({
+        where:{
+          id
+        }
+      })
+        .then((result:object)=> {
+          if(result){
+            Reflect.deleteProperty(result,'hash')
+            return {
+              error:false,
+              message: "Successfully!",
+              data:result
+            }
+          }
+          return {
+            error:true,
+            message: "Notfound!",
+            data:null
+          }
+        })
+    }catch(err){
+      return {
+        error:true,
+        message: err?.mesage ?? null,
+        data:null
+      }
+    }
+  }
 
 }

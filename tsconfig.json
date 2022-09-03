@@ -19,7 +19,9 @@
     "noFallthroughCasesInSwitch": false,
     "skipDefaultLibCheck": true,
     "paths": {
-      "@yid/entities": ["./src/entities/index"]
+      "@yid/entities": ["./src/entities/index"],
+      "@yid/guard": ["./src/guard/index"],
+      "@yid/modules": ["./src/modules"]
     }
   },
   "exclude": ["node_modules"]

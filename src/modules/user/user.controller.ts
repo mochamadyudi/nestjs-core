@@ -1,22 +1,22 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { Request } from 'express'
 import {UserService} from './user.service'
-import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from '@yid/guard';
+import { GetUser } from '../../decorator';
+import { User } from '@prisma/client'
 
 
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController{
     constructor(private userService: UserService) {}
 
-
-
-    @UseGuards(AuthGuard('jwt'))
     @Get('profiles')
-    profiles(@Req() req: Request){
-        console.log({
-            user:req.user
-        })
-        return req.user
+    profiles(
+      @GetUser() user: User,
+      @GetUser('id') id:string
+    ){
+        return this.userService.getProfiles(id)
     }
     @Get(':id')
     get(@Param('id') id){
