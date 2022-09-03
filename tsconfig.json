@@ -19,6 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "skipDefaultLibCheck": true,
     "paths": {
+      "@yid/prisma": ["./src/prisma/index"],
       "@yid/entities": ["./src/entities/index"],
       "@yid/guard": ["./src/guard/index"],
       "@yid/modules": ["./src/modules"]

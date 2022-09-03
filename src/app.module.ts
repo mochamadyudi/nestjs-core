@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule,ConfigService } from '@nestjs/config';
 
 import {AuthModule} from '@yid/modules';
-import { PrismaModule } from './prisma/prisma.module';
+import { PrismaModule } from '@yid/prisma';
 import { UserModule } from '@yid/modules';
 import { RoleModule } from './modules/role';
 
